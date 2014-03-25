@@ -21,19 +21,22 @@ if(empty($sql_query)){
     $sql_query = "";
 }
 
-$csv_output = $_REQUEST['csv_outupt'];  
+$csv_output = $_REQUEST['csv_output'];  
 if(empty($csv_output)){
     $csv_output = "default";
 }
 
-$csv_output = 'xpert';
+//need to handle date ranges for each csv_output case
 
 switch ($csv_output) {
     case 'default':
-        echo "default  case \n";
+        echo "default  case (ad hoc query) \n";
         break;
     case 'loom':
         echo "fruit of the looms case \n";
+		$sql_query = "select p.mfgid, ao.AO_Name, oi.itemname from oitems as oi, products as p, options_Advanced as ao WHERE oi.catalogid = p.catalogid AND ao.ProductID = oi.catalogid ";
+	
+		
         break;
     case 'xpert':
         echo "xpert case \n";
@@ -42,10 +45,10 @@ switch ($csv_output) {
         break;
     case 'hanes':
 	   echo "hanes case \n";
+	$sql_query = "select oi.itemid, oi.numitems from oitems as oi";
+	
 	   break;
 }
-
-
 
 function soap_call($sql) {
 	// build parameters for call
