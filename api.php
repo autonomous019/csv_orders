@@ -21,6 +21,30 @@ if(empty($sql_query)){
     $sql_query = "";
 }
 
+$csv_output = $_REQUEST['csv_outupt'];  
+if(empty($csv_output)){
+    $csv_output = "default";
+}
+
+$csv_output = 'xpert';
+
+switch ($csv_output) {
+    case 'default':
+        echo "default  case \n";
+        break;
+    case 'loom':
+        echo "fruit of the looms case \n";
+        break;
+    case 'xpert':
+        echo "xpert case \n";
+		$sql_query = "select o.orderid, o.invoicenum_prefix, o.invoicenum, oi.itemid, oi.numitems, o.odate, o.oshipfirstname, o.oshiplastname, o.oshipaddress, o.oshipaddress2, o.oshipcity, o.oshipstate, o.oshipzip, o.oshipphone, o.oshipemail, o.ocomment   from orders as o, oitems as oi where o.orderid = 27 AND oi.orderid = o.orderid";
+		
+        break;
+    case 'hanes':
+	   echo "hanes case \n";
+	   break;
+}
+
 
 
 function soap_call($sql) {
@@ -67,6 +91,7 @@ function soap_call($sql) {
 //
 // call soap function.
 $result = soap_call($sql_query);
+
 //
 // checks for result set or error return
 if (is_array($result['0'])) {	
@@ -74,11 +99,16 @@ if (is_array($result['0'])) {
     $result = json_encode($result);
     //print_r($result);
     $json_obj = json_decode($result, true);
+	
     $fp = fopen('./csv/test.csv', 'w');
         foreach ($json_obj as $row) {
+			foreach ($row as $key => $value) {
+			    echo "Key: $key; Value: $value<br />\n";
+			}
             //fputcsv($fp, $row);
+			
 			fputcsv($fp, $row, $delimiter);
-		    echo $row;
+		    
         }
     fclose($fp);
     echo "</pre>";
