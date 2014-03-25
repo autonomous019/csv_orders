@@ -30,16 +30,14 @@
     <!-- Main jumbotron for a primary marketing message or call to action -->
     <div class="jumbotron">
       <div class="container">
+		   
         <h3>Orders CSV Report Generator</h3>
        <form name="orders" action="api.php" method="post">
             From: <input type="text" name="from_date" id="from_date" title="from date" />		
 			To:    <input type="text" name="to_date" id="to_date" title="to date" />	
 			<br /><br />
 			
-			Status <select name="status" id="status" title="status">
-                     <option value="processing" selected>Processing</option>
- 
-                   </select>
+			Status <div id="showresults"></div>
 				   
 				   <br/><br/>
 				   
@@ -63,6 +61,8 @@
         <p><a class="btn btn-primary btn-lg" role="button" onclick="document.orders.submit()">Run Query &raquo;</a></p>
       
 	  </form>
+	  
+	 
 	  </div>
     </div>
 
@@ -82,6 +82,34 @@
         <script src="js/vendor/bootstrap.min.js"></script>
 
         <script src="js/main.js"></script>
+		
+		
+		<script>
+		//compiles the status list for the status dropdown ie. "processing", created by status.php
+		$( document ).ready(function() {
+			
+		  $.ajax({
+		        url: "status.php",
+		        data: {
+		            
+		        },
+		        type: "GET",
+		        dataType: "html",
+		        success: function (data) {
+		            //alert(data);
+		            $('#showresults').html(data);
+		        },
+		        error: function (xhr, status) {
+		            alert("Sorry, there was a problem!");
+		        },
+		        complete: function (xhr, status) {
+		            //$('#showresults').slideDown('slow')
+		        }
+		    });
+		});
+		</script>
+		
+		
 
         <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
         <script>

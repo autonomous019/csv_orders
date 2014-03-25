@@ -15,7 +15,7 @@ $uid = uniqid();
 
 $delimiter = $_REQUEST['delimiter'];  #  '\t'  tab  '|' pipe ',' comma
 if(empty($delimiter)){
-    $delimiter = "\t";
+    $delimiter = ",";
 }
 $sql_query = $_REQUEST['sql_query'];  
 if(empty($sql_query)){
