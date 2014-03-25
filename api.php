@@ -1,4 +1,6 @@
 <?php
+
+
 //api.php
 
 /*
@@ -8,6 +10,18 @@
 */
 
 //Send data to the 3dcart api to query the database. 
+
+
+$delimiter = $_REQUEST['delimiter'];  #  '\t'  tab  '|' pipe ',' comma
+if(empty($delimiter)){
+    $delimiter = ",";
+}
+$sql_query = $_REQUEST['sql_query'];  
+if(empty($sql_query)){
+    $sql_query = "";
+}
+
+
 
 function soap_call($sql) {
 	// build parameters for call
@@ -49,21 +63,35 @@ function soap_call($sql) {
 
 
 // write your SQL statements
-$sql ="select * from orders;";
+//$sql ="select * from orders where orders.orderid = 27;";
 //
 // call soap function.
-$result = soap_call($sql);
+$result = soap_call($sql_query);
 //
 // checks for result set or error return
 if (is_array($result['0'])) {	
-//Place your code to manipulate the result set here.
-echo "<pre>";
-print_r($result);
-echo "</pre>";
+    $delimiter = $delimiter;
+    $result = json_encode($result);
+    //print_r($result);
+    $json_obj = json_decode($result, true);
+    $fp = fopen('./csv/test.csv', 'w');
+        foreach ($json_obj as $row) {
+            //fputcsv($fp, $row);
+			fputcsv($fp, $row, $delimiter);
+		    echo $row;
+        }
+    fclose($fp);
+    echo "</pre>";
 } else {
-//
-// prints out error message
-echo $result['0'];
+    //
+    // prints out error message
+	
+    echo "ERROR \n";
+	echo $result[0];
 }
+
+
+
+
 
 ?>
