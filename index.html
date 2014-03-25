@@ -32,7 +32,7 @@
       <div class="container">
 		   
         <h3>Orders CSV Report Generator</h3>
-       <form name="orders" action="api.php" method="post">
+       <form name="orders" action="api.php" method="post" id="orders">
             From: <input type="text" name="from_date" id="from_date" title="from date" />		
 			To:    <input type="text" name="to_date" id="to_date" title="to date" />	
 			<br /><br />
@@ -49,21 +49,53 @@
                    </select>	   
 				   
 				   <br/><br/>
+				   
+			CSV Delimiter  <select name="delimiter" id="delimiter" title="delimiter">
+                     <option value="," selected>Comma</option>
+					  <option value="\t" >Tabs</option>
+					   <option value="|" >Pipe (|)</option>
+ 
+                   </select>	   
 		   
-		   
+		   <br /><br />
 		<input type="checkbox" name="ad_hoc" value="ad_hoc">Ad Hoc Query?<br>  
 		<!-- Select <input type="text" name="sql_select" id="sql_select" title="sql_select"  style="width: 340px;" /><br />
 		From <select name="sql_from"><option value="orders">orders</select>	<br />
 		Where <input type="text" name="sql_where" id="sql_where" title="sql_where"  style="width: 340px;" /><br />	
 			-->
-			<textarea name="sql_query" style="width: 340px;"></textarea>
+			<textarea name="sql_query" style="width: 340px; height: 140px;"></textarea>
 		   
-        <p><a class="btn btn-primary btn-lg" role="button" onclick="document.orders.submit()">Run Query &raquo;</a></p>
+        <p><input type="submit" id="btn btn-primary btn-lg" name="btn btn-primary btn-lg" role="button" value="Run Query"></submit></p>
       
 	  </form>
+	  <hr>
+	  CSV Viewer:<br />
+	  <div id="csv_viewer"></div>
 	  
 	 
-	  </div>
+	 
+	  
+	  
+	  <br />
+	  
+	  
+	  
+	  <p><a class="btn btn-primary btn-lg" role="button" onclick="downloader();">Download &raquo;</a></p>
+	  
+	  
+	  <hr>
+	  
+	  <form id="ftp" name="ftp">
+	  Username: <input type="text" name="username" id="username" text="username" /><br />
+	  Password: <input type="password" name="password" id="password" text="password" /><br />
+	  <p><a class="btn btn-primary btn-lg" role="button" onclick="document.orders.submit()">Send to Server</a></p>
+	  
+	  </form>
+	  
+	  
+	  
+	   </div>
+	  
     </div>
 
     <div class="container">
@@ -107,6 +139,34 @@
 		        }
 		    });
 		});
+		
+	
+			
+			$("#orders").submit(function(e)
+			{
+				
+			    var postData = $(this).serializeArray();
+			    var formURL = $(this).attr("action");
+			    $.ajax(
+			    {
+			        url : formURL,
+			        type: "POST",
+			        data : postData,
+			        success:function(data, textStatus, jqXHR) 
+			        {
+			            //data: return data from server
+						$('#csv_viewer').html(data);
+			        },
+			        error: function(jqXHR, textStatus, errorThrown) 
+			        {
+			            //if fails      
+			        }
+			    });
+			    e.preventDefault(); //STOP default action
+			    //e.unbind(); //unbind. to stop multiple form submit.
+			});
+		
+	
 		</script>
 		
 		
