@@ -11,10 +11,11 @@
 
 //Send data to the 3dcart api to query the database. 
 
+$uid = uniqid();
 
 $delimiter = $_REQUEST['delimiter'];  #  '\t'  tab  '|' pipe ',' comma
 if(empty($delimiter)){
-    $delimiter = ",";
+    $delimiter = "\t";
 }
 $sql_query = $_REQUEST['sql_query'];  
 if(empty($sql_query)){
@@ -26,26 +27,68 @@ if(empty($csv_output)){
     $csv_output = "default";
 }
 
+$ad_hoc = $_REQUEST['ad_hoc'];  
+if(!empty($ad_hoc)){
+    $csv_output = "default";
+}
+
 //need to handle date ranges for each csv_output case
+$from_date = $_REQUEST['from_date'];  
+if(empty($from_date)){
+    $from_date = "";
+} 
+
+$to_date = $_REQUEST['to_date'];  
+if(empty($to_date)){
+    $to_date = "";
+}
+
+if(!empty($from_date) && !empty($to_date) ) {
+
+	$date_sql = " AND orders.odate BETWEEN \"".$from_date."\" AND \"".$to_date."\" ";
+	
+	
+} else {
+	$date_sql = "";
+}
 
 switch ($csv_output) {
     case 'default':
         echo "default  case (ad hoc query) \n";
+		//$sql_query = $sql_query." ".$date_sql;
+		$sql_query = $sql_query;
+		$csv_header = "";
+		/*
+		get order status list
+		select order_Status.StatusText from order_Status, orders where orders.status = order_Status.id
+		select order_Status.StatusText from order_Status, orders where orders.status = order_Status.StatusId
+		
+		select distinct order_Status.StatusText from order_Status
+
+		
+		
+select odate from orders where odate BETWEEN  CAST('2014-01-01' AS DATETIME)
+                        AND CAST('2014-01-31' AS DATETIME);
+		
+		*/
         break;
     case 'loom':
         echo "fruit of the looms case \n";
 		$sql_query = "select p.mfgid, ao.AO_Name, oi.itemname from oitems as oi, products as p, options_Advanced as ao WHERE oi.catalogid = p.catalogid AND ao.ProductID = oi.catalogid ";
+		$csv_header = "";
 	
 		
         break;
     case 'xpert':
         echo "xpert case \n";
-		$sql_query = "select o.orderid, o.invoicenum_prefix, o.invoicenum, oi.itemid, oi.numitems, o.odate, o.oshipfirstname, o.oshiplastname, o.oshipaddress, o.oshipaddress2, o.oshipcity, o.oshipstate, o.oshipzip, o.oshipphone, o.oshipemail, o.ocomment   from orders as o, oitems as oi where o.orderid = 27 AND oi.orderid = o.orderid";
+		$sql_query = "select o.orderid, o.invoicenum_prefix, o.invoicenum, oi.itemid, oi.numitems, o.odate, o.oshipfirstname, o.oshiplastname, o.oshipaddress, o.oshipaddress2, o.oshipcity, o.oshipstate, o.oshipzip, o.oshipphone, o.oshipemail, o.ocomment   from orders as o, oitems as oi where o.orderid = 27 AND oi.orderid = o.orderid ";
+		$csv_header = "order_number".$delimiter." sku".$delimiter." qty".$delimiter." order_date".$delimiter." first_name".$delimiter." last_name".$delimiter." address_1".$delimiter." address_2".$delimiter." city".$delimiter." state ".$delimiter."zip ".$delimiter."telephone ".$delimiter."email ".$delimiter." notes";
 		
         break;
     case 'hanes':
 	   echo "hanes case \n";
 	$sql_query = "select oi.itemid, oi.numitems from oitems as oi";
+	$csv_header = "";
 	
 	   break;
 }
@@ -105,6 +148,8 @@ if (is_array($result['0'])) {
 	
     $fp = fopen('./csv/test.csv', 'w');
         foreach ($json_obj as $row) {
+			$text = $csv_header . "\n";
+			fputs ($fp, "$text");
 			foreach ($row as $key => $value) {
 			    echo "Key: $key; Value: $value<br />\n";
 			}
