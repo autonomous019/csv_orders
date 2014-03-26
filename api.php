@@ -8,10 +8,14 @@
 <storeUrl>www.jocksntees.com</storeUrl>
 
 */
-
+//print_r($_REQUEST);
 //Send data to the 3dcart api to query the database. 
+$file_name = $_REQUEST['file_name'];  #  '\t'  tab  '|' pipe ',' comma
+if(empty($file_name)){
+    $file_name = " ";
+}
+$uid = $file_name;
 
-$uid = uniqid();
 
 $delimiter = $_REQUEST['delimiter'];  #  '\t'  tab  '|' pipe ',' comma
 if(empty($delimiter)){
@@ -147,42 +151,47 @@ if (is_array($result['0'])) {
     $json_obj = json_decode($result, true);
 	
     //chmod("csv/'.$uid.'.csv, 0775);
-	$fp = fopen('csv/'.$uid.'.csv', 'w');
+	
 
-	$file = 'csv/'.$uid.'.csv';
-	
-	$current = file_get_contents($file);
-	
-	$text = $csv_header . "\n <br />";
-	echo $text;
-	
-	$current .= $text;
+	$file = 'csv/'.$uid;
+	$text = trim($csv_header) . "\n ";
+
 	$field_cnt = count(split($delimiter, $csv_header));
-	//echo "field count ".$field_cnt;
-	//print_r($json_obj);
-	
-	
-	//echo $json_obj[0]['itemid'];
-	//echo $json_obj[0]['numitems'];
-	//echo count($json_obj);
-	
-	//put in delimiter and write to file then display file for preview
+    //have to account for different headers and fields for different csv_output formats here
+	//if($csv_output) == 'hanes'
 	$cnt = 0;
+	$lines = [];
+	$read_lines = [];
+
 	for($cnt = 0; $cnt<count($json_obj); $cnt++){
-		echo $json_obj[$cnt]['itemid'];
-		echo $delimiter;
-		echo $json_obj[$cnt]['numitems'];
-		echo "<br />";
-		
-		
+		$item_id = $json_obj[$cnt]['itemid'];
+		$numitems = $json_obj[$cnt]['numitems'];
+		$line .= $item_id . $delimiter . $numitems . "\n ";
 		
 	}
+	array_push($lines, $line);
+	//array_push($lines, $text);
+	array_unshift($lines, $text);
+	$result = array_merge((array)$lines, (array)$read_lines);
 	
-	//fputcsv($fp, $current, $delimiter);
+	$fp = fopen('csv/'.$uid, 'w');
+	echo "<pre>";
+	foreach($lines as $l){
+		$l_arr = [];
+		array_push($l_arr, $l);
+		echo $l;
+		fwrite($fp, $l);
+		//fputcsv($fp, $l_arr, $delimiter);
+	}
 	
-	$file = file_get_contents('csv/'.$uid.'.csv', true);
-	//echo $file;  //output to csv preview div
-  
+	
+	//$file = file_get_contents('csv/'.$uid, true);
+	echo "</pre>";
+	
+	//fputcsv($fp, $lines, $delimiter);
+	
+	
+	
 } else {
     //
     // prints out error message

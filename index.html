@@ -73,7 +73,7 @@
       
 	  </form>
 	  <hr>
-	  CSV Viewer:<br />
+	  <div id="viewer" style="display: none;"><h3>CSV Viewer:</h3></div>
 	  <div id="csv_viewer" style="width:640px; height:400px; overflow:scroll; display: none;"></div>
 	  
 	 
@@ -84,19 +84,30 @@
 	  
 	  
 	  
-	  <p><a class="btn btn-primary btn-lg" role="button"  id="download" name="download" href="">Download &raquo;</a></p>
+	  <p><a class="btn btn-primary btn-lg" role="button"  id="download" name="download" href="" style="display:none;">Download &raquo;</a></p>
 	  
 	  
 	  <hr>
+	  <!-- 
+		
+		  Host: ftp.pointbweb.net
+		  Login: test@pointbweb.net
+		  PW: pbw#test1
+
+          tests hard coded into form, remove before production
+		
+		  
+		  -->
+	  <form id="ftp" name="ftp" action="ftp.php" method="post" style="display: none;">
 	  
-	  <form id="ftp" name="ftp">
-	  
-	  Username: <input type="text" name="username" id="username" text="username" style="margin-left: 10px;" /><br />
-	  Password: <input type="password" name="password" id="password" text="password" style="margin-left: 12px;" /><br />
-	  Hostname: <input type="text" name="hostname" id="hostname" text="hostname" style="margin-left: 10px;" /><br /><br />
-	  <p><a class="btn btn-primary btn-lg" role="button" onclick="document.orders.submit()">Send to Server</a></p>
+	  Username: <input type="text" value="test@pointbweb.net" name="username" id="username" text="username" style="margin-left: 10px;" /><br />
+	  Password: <input type="password" value="pbw#test1" name="password" id="password" text="password" style="margin-left: 12px;" /><br />
+	  Hostname: <input type="text" value="ftp.pointbweb.net" name="hostname" id="hostname" text="hostname" style="margin-left: 10px;" /><br /><br />
+	  <input type="hidden"  name="file_to_send" id="file_to_send">
+	         <p><input type="submit" id="btn btn-primary btn-lg" name="btn btn-primary btn-lg" role="button" value="Send via FTP"></submit></p>
 	  
 	  </form>
+	  <div id="ftp_status"></div>
 	  
 	  
 	  
@@ -175,6 +186,7 @@ $( document ).ready(function() {
    
     $("#file_name").val(file_name);
 	$("#download").attr("href", "csv/"+file_name);
+	$("#file_to_send").val(file_name);
 
 
 
@@ -186,6 +198,7 @@ $( document ).ready(function() {
                $("#sql_query").val(" ");
 		    file_name = year + "-" + month + "-" +day+ "-" +hour+minutes+secs+"-ad_hoc.csv";
 			$("#file_name").val(file_name);
+			$("#file_to_send").val(file_name);
 			$("#download").attr("href", "csv/"+file_name);
           }
 		   	
@@ -196,6 +209,7 @@ $( document ).ready(function() {
 		{
 		    
 		    var file_name = $("#file_name").val();
+			$("#file_to_send").val(file_name);
 			//alert(file_name);
 			$("#download").attr("href", "csv/"+file_name);
 			//need to update download href	
@@ -215,6 +229,7 @@ $( document ).ready(function() {
 				
 			    file_name = year + "-" + month + "-" +day+ "-" +hour+minutes+secs+"-xpert.csv";
 				$("#file_name").val(file_name);
+				$("#file_to_send").val(file_name);
 				$("#download").attr("href", "csv/"+file_name);
 				
 			} else if(csv_output == 'loom'){
@@ -222,6 +237,7 @@ $( document ).ready(function() {
 				$("#sql_query").val(csv_sql);
 			    file_name = year + "-" + month + "-" +day+ "-" +hour+minutes+secs+"-loom.csv";
 				$("#file_name").val(file_name);
+				$("#file_to_send").val(file_name);
 				$("#download").attr("href", "csv/"+file_name);
 				
 			} else {
@@ -229,6 +245,7 @@ $( document ).ready(function() {
 				$("#sql_query").val(csv_sql);
 			    file_name = year + "-" + month + "-" +day+ "-" +hour+minutes+secs+"-hanes.csv";
 				$("#file_name").val(file_name);
+				$("#file_to_send").val(file_name);
 				$("#download").attr("href", "csv/"+file_name);
 				
 			}
@@ -239,6 +256,9 @@ $( document ).ready(function() {
 			$("#orders").submit(function(e)
 			{
 				$("#csv_viewer").show();
+				$("#viewer").show();
+				$("#download").show();
+				$("#ftp").show();
 				$("#csv_viewer").css("background-color","#000");
 				$("#csv_viewer").css("color","#fff");
 				$("#csv_viewer").css("font-family", "Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New");
@@ -263,6 +283,47 @@ $( document ).ready(function() {
 			    e.preventDefault(); //STOP default action
 			    //e.unbind(); //unbind. to stop multiple form submit.
 			});
+			
+			
+			
+			
+			$("#ftp").submit(function(e)
+			{
+				
+			    var postData = $(this).serializeArray();
+			    var formURL = $(this).attr("action");
+				var file_to_send = $("#file_name").val();
+				alert(file_to_send);
+				
+				$("#file_to_send").val(file_to_send);
+				alert($("#file_to_send").val());
+				
+			    $.ajax(
+			    {
+			        url : formURL,
+			        type: "POST",
+			        data : postData,
+			        success:function(data, textStatus, jqXHR) 
+			        {
+			            //data: return data from server
+						$('#ftp_status').html(data);
+			        },
+			        error: function(jqXHR, textStatus, errorThrown) 
+			        {
+			            //if fails      
+			        }
+			    });
+			    e.preventDefault(); //STOP default action
+			    //e.unbind(); //unbind. to stop multiple form submit.
+			});
+			
+			
+			
+			
+			
+			
+			
+			
 		
 	}); //ends document ready func
 		</script>
