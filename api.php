@@ -158,31 +158,29 @@ if (is_array($result['0'])) {
 	$current .= $text;
 	$field_cnt = count(split($delimiter, $csv_header));
 	echo "field count ".$field_cnt;
+	//print_r($json_obj);
 	
-        foreach ($json_obj as $row) {
-		    
-			$counter = 0;
-			foreach ($row as $key => $value) {
-			    $current .= $value;
-				if($counter==$field_cnt - 1){
-					$current .= "\n <br />";
-				}
-				$counter++;
-				
-			}
-			$current = split(" ", $current);
-            //fputcsv($fp, $row);
-			echo $current;
-			
-			fputcsv($fp, $current, $delimiter);
-		    
-        }
+	
+	echo $json_obj[0]['itemid'];
+	echo $json_obj[0]['numitems'];
+	//echo count($json_obj);
+	
+	//put in delimiter and write to file then display file for preview
+	$cnt = 0;
+	for($cnt = 0; $cnt<count($json_obj); $cnt++){
+		echo $json_obj[$cnt]['itemid'];
+		echo " ";
+		echo $json_obj[$cnt]['numitems'];
+		echo "<br />";
 		
-		//file_put_contents($file, $current);
 		
-
+		
+	}
+	
+	fputcsv($fp, $current, $delimiter);
+	
 	$file = file_get_contents('csv/'.$uid.'.csv', true);
-	echo $file;  //output to csv preview div
+	//echo $file;  //output to csv preview div
   
 } else {
     //
