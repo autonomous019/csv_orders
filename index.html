@@ -43,8 +43,8 @@
 				   
 			CSV Output <select name="csv_output" id="csv_output" title="vendor" >
                      <option value="hanes" selected>Hanes</option>
-					  <option value="loom" >Fruit of the Loom</option>
-					   <option value="xpert" >Xpert</option>
+					 <option value="loom" >Fruit of the Loom</option>
+					 <option value="xpert" >Xpert</option>
  
                    </select>	   
 				   
@@ -58,11 +58,13 @@
                    </select>	   
 		   
 		   <br /><br />
-		<input type="checkbox" name="ad_hoc" value="ad_hoc">Ad Hoc Query?<br>  
-		<!-- Select <input type="text" name="sql_select" id="sql_select" title="sql_select"  style="width: 340px;" /><br />
-		From <select name="sql_from"><option value="orders">orders</select>	<br />
-		Where <input type="text" name="sql_where" id="sql_where" title="sql_where"  style="width: 340px;" /><br />	
-			-->
+		   
+		    File Name <input type="text" name="file_name" id="file_name" title="file_name"  style="width: 240px;"/>
+			<br /><br />
+			
+			
+		<input type="checkbox" name="ad_hoc" id="ad_hoc" value="ad_hoc">Ad Hoc Query?<br>  
+
 			<textarea name="sql_query" id="sql_query" style="width: 340px; height: 140px;">select oi.itemid, oi.numitems from oitems as oi
 				
 			</textarea>
@@ -72,7 +74,7 @@
 	  </form>
 	  <hr>
 	  CSV Viewer:<br />
-	  <div id="csv_viewer"></div>
+	  <div id="csv_viewer" style="width:640px; height:400px; overflow:scroll; display: none;"></div>
 	  
 	 
 	 
@@ -82,17 +84,16 @@
 	  
 	  
 	  
-	  <p><a class="btn btn-primary btn-lg" role="button" onclick="downloader();">Download &raquo;</a></p>
+	  <p><a class="btn btn-primary btn-lg" role="button"  id="download" name="download" href="">Download &raquo;</a></p>
 	  
 	  
 	  <hr>
 	  
 	  <form id="ftp" name="ftp">
 	  
-	  Username: <input type="text" name="username" id="username" text="username" /><br />
-	  
-	  Password: <input type="password" name="password" id="password" text="password" /><br />
-	  Hostame: <input type="text" name="hostname" id="hostname" text="hostname" /><br />
+	  Username: <input type="text" name="username" id="username" text="username" style="margin-left: 10px;" /><br />
+	  Password: <input type="password" name="password" id="password" text="password" style="margin-left: 12px;" /><br />
+	  Hostname: <input type="text" name="hostname" id="hostname" text="hostname" style="margin-left: 10px;" /><br /><br />
 	  <p><a class="btn btn-primary btn-lg" role="button" onclick="document.orders.submit()">Send to Server</a></p>
 	  
 	  </form>
@@ -100,6 +101,8 @@
 	  
 	  
 	   </div>
+	   
+	
 	  
     </div>
 
@@ -122,8 +125,17 @@
 		
 		
 		<script>
+		
+		
+		
+		
 		//compiles the status list for the status dropdown ie. "processing", created by status.php
 		$( document ).ready(function() {
+			
+			
+			
+			
+			
 			
 		  $.ajax({
 		        url: "status.php",
@@ -146,19 +158,50 @@
 		});
 		
 		
+$( document ).ready(function() {
+	
+    var today = new Date();
+    var day = today.getDate();
+    var month = today.getMonth();
+    var minutes = today.getMinutes();
+    var secs = today.getSeconds();
+    var hour = today.getHours();
+    var year = today.getFullYear();
+    var outputter = $("#csv_output").val();
+
+
+    //YYYY-MM-DD-hhmmss-name.csv (e.g. 2014-03-26-121507-Hanes.csv
+    var file_name = year + "-" + month + "-" +day+ "-" +hour+minutes+secs+"-"+outputter+".csv";
+   
+    $("#file_name").val(file_name);
+	$("#download").attr("href", "csv/"+file_name);
+
+
+
 		
-		/*
-		hanes (default):
-		select oi.itemid, oi.numitems from oitems as oi
+		$("#ad_hoc").change(function(e)
+		{
+          if ($(this).is(':checked')) {
+			  
+               $("#sql_query").val(" ");
+		    file_name = year + "-" + month + "-" +day+ "-" +hour+minutes+secs+"-ad_hoc.csv";
+			$("#file_name").val(file_name);
+			$("#download").attr("href", "csv/"+file_name);
+          }
+		   	
+			
+		});
 		
-		loom:
-		select p.mfgid, ao.AO_Name, oi.itemname from oitems as oi, products as p, options_Advanced as ao WHERE oi.catalogid = p.catalogid AND ao.ProductID = oi.catalogid
+	    $("#file_name").change(function(e)
+		{
+		    
+		    var file_name = $("#file_name").val();
+			//alert(file_name);
+			$("#download").attr("href", "csv/"+file_name);
+			//need to update download href	
+			
+		});
 		
-		
-		xpert:
-		select o.orderid, o.invoicenum_prefix, o.invoicenum, oi.itemid, oi.numitems, o.odate, o.oshipfirstname, o.oshiplastname, o.oshipaddress, o.oshipaddress2, o.oshipcity, o.oshipstate, o.oshipzip, o.oshipphone, o.oshipemail, o.ocomment   from orders as o, oitems as oi where o.orderid = 27 AND oi.orderid = o.orderid
-		
-		*/
 		$("#csv_output").change(function(e)
 		{
 		    var csv_output = $(this).val();
@@ -169,12 +212,24 @@
 			if(csv_output == 'xpert'){
 				csv_sql = "select o.orderid, o.invoicenum_prefix, o.invoicenum, oi.itemid, oi.numitems, o.odate, o.oshipfirstname, o.oshiplastname, o.oshipaddress, o.oshipaddress2, o.oshipcity, o.oshipstate, o.oshipzip, o.oshipphone, o.oshipemail, o.ocomment   from orders as o, oitems as oi where o.orderid = 27 AND oi.orderid = o.orderid";
 				$("#sql_query").val(csv_sql);
+				
+			    file_name = year + "-" + month + "-" +day+ "-" +hour+minutes+secs+"-xpert.csv";
+				$("#file_name").val(file_name);
+				$("#download").attr("href", "csv/"+file_name);
+				
 			} else if(csv_output == 'loom'){
 				csv_sql = "select p.mfgid, ao.AO_Name, oi.itemname from oitems as oi, products as p, options_Advanced as ao WHERE oi.catalogid = p.catalogid AND ao.ProductID = oi.catalogid";
 				$("#sql_query").val(csv_sql);
+			    file_name = year + "-" + month + "-" +day+ "-" +hour+minutes+secs+"-loom.csv";
+				$("#file_name").val(file_name);
+				$("#download").attr("href", "csv/"+file_name);
+				
 			} else {
 				csv_sql = "select oi.itemid, oi.numitems from oitems as oi";
 				$("#sql_query").val(csv_sql);
+			    file_name = year + "-" + month + "-" +day+ "-" +hour+minutes+secs+"-hanes.csv";
+				$("#file_name").val(file_name);
+				$("#download").attr("href", "csv/"+file_name);
 				
 			}
 			
@@ -183,6 +238,10 @@
 			
 			$("#orders").submit(function(e)
 			{
+				$("#csv_viewer").show();
+				$("#csv_viewer").css("background-color","#000");
+				$("#csv_viewer").css("color","#fff");
+				$("#csv_viewer").css("font-family", "Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New");
 				
 			    var postData = $(this).serializeArray();
 			    var formURL = $(this).attr("action");
@@ -205,7 +264,7 @@
 			    //e.unbind(); //unbind. to stop multiple form submit.
 			});
 		
-	
+	}); //ends document ready func
 		</script>
 		
 		
