@@ -54,7 +54,7 @@ if(!empty($from_date) && !empty($to_date) ) {
 
 switch ($csv_output) {
     case 'default':
-        echo "default  case (ad hoc query) \n";
+        //echo "default  case (ad hoc query) \n";
 		//$sql_query = $sql_query." ".$date_sql;
 		$sql_query = $sql_query;
 		$csv_header = "";
@@ -73,20 +73,20 @@ select odate from orders where odate BETWEEN  CAST('2014-01-01' AS DATETIME)
 		*/
         break;
     case 'loom':
-        echo "fruit of the looms case \n";
+        //echo "fruit of the looms case \n";
 		$sql_query = "select p.mfgid, ao.AO_Name, oi.itemname from oitems as oi, products as p, options_Advanced as ao WHERE oi.catalogid = p.catalogid AND ao.ProductID = oi.catalogid ";
 		$csv_header = "";
 	
 		
         break;
     case 'xpert':
-        echo "xpert case \n";
+        //echo "xpert case \n";
 		$sql_query = "select o.orderid, o.invoicenum_prefix, o.invoicenum, oi.itemid, oi.numitems, o.odate, o.oshipfirstname, o.oshiplastname, o.oshipaddress, o.oshipaddress2, o.oshipcity, o.oshipstate, o.oshipzip, o.oshipphone, o.oshipemail, o.ocomment   from orders as o, oitems as oi where o.orderid = 27 AND oi.orderid = o.orderid ";
 		$csv_header = "order_number".$delimiter." sku".$delimiter." qty".$delimiter." order_date".$delimiter." first_name".$delimiter." last_name".$delimiter." address_1".$delimiter." address_2".$delimiter." city".$delimiter." state ".$delimiter."zip ".$delimiter."telephone ".$delimiter."email ".$delimiter." notes";
 		
         break;
     case 'hanes':
-	   echo "hanes case \n";
+	   //echo "hanes case \n";
 	$sql_query = "select oi.itemid, oi.numitems from oitems as oi";
 	$csv_header = "SKU, Quantity";
 	
@@ -153,23 +153,24 @@ if (is_array($result['0'])) {
 	
 	$current = file_get_contents($file);
 	
-	$text = $csv_header . "\n";
+	$text = $csv_header . "\n <br />";
+	echo $text;
 	
 	$current .= $text;
 	$field_cnt = count(split($delimiter, $csv_header));
-	echo "field count ".$field_cnt;
+	//echo "field count ".$field_cnt;
 	//print_r($json_obj);
 	
 	
-	echo $json_obj[0]['itemid'];
-	echo $json_obj[0]['numitems'];
+	//echo $json_obj[0]['itemid'];
+	//echo $json_obj[0]['numitems'];
 	//echo count($json_obj);
 	
 	//put in delimiter and write to file then display file for preview
 	$cnt = 0;
 	for($cnt = 0; $cnt<count($json_obj); $cnt++){
 		echo $json_obj[$cnt]['itemid'];
-		echo " ";
+		echo $delimiter;
 		echo $json_obj[$cnt]['numitems'];
 		echo "<br />";
 		
@@ -177,7 +178,7 @@ if (is_array($result['0'])) {
 		
 	}
 	
-	fputcsv($fp, $current, $delimiter);
+	//fputcsv($fp, $current, $delimiter);
 	
 	$file = file_get_contents('csv/'.$uid.'.csv', true);
 	//echo $file;  //output to csv preview div

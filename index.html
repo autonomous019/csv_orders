@@ -37,11 +37,11 @@
 			To:    <input type="text" name="to_date" id="to_date" title="to date" />	
 			<br /><br />
 			
-			Status <div id="showresults"></div>
+			Status <div id="showresults" style="display:inline;"></div>
 				   
 				   <br/><br/>
 				   
-			CSV Output <select name="csv_output" id="csv_output" title="vendor">
+			CSV Output <select name="csv_output" id="csv_output" title="vendor" >
                      <option value="hanes" selected>Hanes</option>
 					  <option value="loom" >Fruit of the Loom</option>
 					   <option value="xpert" >Xpert</option>
@@ -63,7 +63,9 @@
 		From <select name="sql_from"><option value="orders">orders</select>	<br />
 		Where <input type="text" name="sql_where" id="sql_where" title="sql_where"  style="width: 340px;" /><br />	
 			-->
-			<textarea name="sql_query" style="width: 340px; height: 140px;"></textarea>
+			<textarea name="sql_query" id="sql_query" style="width: 340px; height: 140px;">select oi.itemid, oi.numitems from oitems as oi
+				
+			</textarea>
 		   
         <p><input type="submit" id="btn btn-primary btn-lg" name="btn btn-primary btn-lg" role="button" value="Run Query"></submit></p>
       
@@ -86,8 +88,11 @@
 	  <hr>
 	  
 	  <form id="ftp" name="ftp">
+	  
 	  Username: <input type="text" name="username" id="username" text="username" /><br />
+	  
 	  Password: <input type="password" name="password" id="password" text="password" /><br />
+	  Hostame: <input type="text" name="hostname" id="hostname" text="hostname" /><br />
 	  <p><a class="btn btn-primary btn-lg" role="button" onclick="document.orders.submit()">Send to Server</a></p>
 	  
 	  </form>
@@ -140,7 +145,41 @@
 		    });
 		});
 		
-	
+		
+		
+		/*
+		hanes (default):
+		select oi.itemid, oi.numitems from oitems as oi
+		
+		loom:
+		select p.mfgid, ao.AO_Name, oi.itemname from oitems as oi, products as p, options_Advanced as ao WHERE oi.catalogid = p.catalogid AND ao.ProductID = oi.catalogid
+		
+		
+		xpert:
+		select o.orderid, o.invoicenum_prefix, o.invoicenum, oi.itemid, oi.numitems, o.odate, o.oshipfirstname, o.oshiplastname, o.oshipaddress, o.oshipaddress2, o.oshipcity, o.oshipstate, o.oshipzip, o.oshipphone, o.oshipemail, o.ocomment   from orders as o, oitems as oi where o.orderid = 27 AND oi.orderid = o.orderid
+		
+		*/
+		$("#csv_output").change(function(e)
+		{
+		    var csv_output = $(this).val();
+			var csv_sql = "";
+			
+			//alert(csv_output);
+			//alert($(this).val());	
+			if(csv_output == 'xpert'){
+				csv_sql = "select o.orderid, o.invoicenum_prefix, o.invoicenum, oi.itemid, oi.numitems, o.odate, o.oshipfirstname, o.oshiplastname, o.oshipaddress, o.oshipaddress2, o.oshipcity, o.oshipstate, o.oshipzip, o.oshipphone, o.oshipemail, o.ocomment   from orders as o, oitems as oi where o.orderid = 27 AND oi.orderid = o.orderid";
+				$("#sql_query").val(csv_sql);
+			} else if(csv_output == 'loom'){
+				csv_sql = "select p.mfgid, ao.AO_Name, oi.itemname from oitems as oi, products as p, options_Advanced as ao WHERE oi.catalogid = p.catalogid AND ao.ProductID = oi.catalogid";
+				$("#sql_query").val(csv_sql);
+			} else {
+				csv_sql = "select oi.itemid, oi.numitems from oitems as oi";
+				$("#sql_query").val(csv_sql);
+				
+			}
+			
+			
+		});
 			
 			$("#orders").submit(function(e)
 			{
