@@ -88,7 +88,7 @@ select odate from orders where odate BETWEEN  CAST('2014-01-01' AS DATETIME)
     case 'hanes':
 	   echo "hanes case \n";
 	$sql_query = "select oi.itemid, oi.numitems from oitems as oi";
-	$csv_header = "";
+	$csv_header = "SKU, Quantity";
 	
 	   break;
 }
@@ -146,20 +146,44 @@ if (is_array($result['0'])) {
     //print_r($result);
     $json_obj = json_decode($result, true);
 	
-    $fp = fopen('./csv/test.csv', 'w');
+    //chmod("csv/'.$uid.'.csv, 0775);
+	$fp = fopen('csv/'.$uid.'.csv', 'w');
+
+	$file = 'csv/'.$uid.'.csv';
+	
+	$current = file_get_contents($file);
+	
+	$text = $csv_header . "\n";
+	
+	$current .= $text;
+	$field_cnt = count(split($delimiter, $csv_header));
+	echo "field count ".$field_cnt;
+	
         foreach ($json_obj as $row) {
-			$text = $csv_header . "\n";
-			fputs ($fp, "$text");
+		    
+			$counter = 0;
 			foreach ($row as $key => $value) {
-			    echo "Key: $key; Value: $value<br />\n";
+			    $current .= $value;
+				if($counter==$field_cnt - 1){
+					$current .= "\n <br />";
+				}
+				$counter++;
+				
 			}
+			$current = split(" ", $current);
             //fputcsv($fp, $row);
+			echo $current;
 			
-			fputcsv($fp, $row, $delimiter);
+			fputcsv($fp, $current, $delimiter);
 		    
         }
-    fclose($fp);
-    echo "</pre>";
+		
+		//file_put_contents($file, $current);
+		
+
+	$file = file_get_contents('csv/'.$uid.'.csv', true);
+	echo $file;  //output to csv preview div
+  
 } else {
     //
     // prints out error message
