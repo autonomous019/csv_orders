@@ -155,10 +155,10 @@ if (is_array($result['0'])) {
 			$c++;
 			
 		}
-		array_push($lines, $line);
+		
 		
 	}
-	
+	array_push($lines, $line);
 
 	array_unshift($lines, $text);
 	$result = array_merge((array)$lines, (array)$read_lines);
