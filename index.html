@@ -68,17 +68,24 @@
 			<textarea name="sql_query" id="sql_query" style="width: 340px; height: 140px;">select oi.itemid, oi.numitems from oitems as oi
 				
 			</textarea>
-			<br /><br />
-			<textarea name="csv_header" id="csv_header" style="width: 640px; height: 140px;">Record Type|PO Number|Address Type|First Name|Last Name|Address 1|Address 2|City|State|Zip|Phone|Email
-Record Type|UPC|Quantity|||||||||
-S|JNT1|R|Eric Dash|jocksntees Inc|c/o Xpert Fulfillment|8160 Cadillac Hwy|Benzonia|MI|49616|(206)588-2558|ericdash@comcast.net
-				
-			</textarea>
-		   
+
         <p><input type="submit" id="btn btn-primary btn-lg" name="btn btn-primary btn-lg" role="button" value="Run Query"></submit></p>
       
+	  <br /><br />
+	  CSV Header:
+	  			<br />
+	  			<textarea name="csv_header" id="csv_header" style="width: 640px; height: 140px;">Record Type|PO Number|Address Type|First Name|Last Name|Address 1|Address 2|City|State|Zip|Phone|EmailRecord Type|UPC|Quantity|||||||||S|JNT1|R|Eric Dash|jocksntees Inc|c/o Xpert Fulfillment|8160 Cadillac Hwy|Benzonia|MI|49616|(206)588-2558|ericdash@comcast.net
+				
+	  			</textarea>
+	  
+	  
+	  
+	  
 	  </form>
 	  <hr>
+	  
+	
+	  
 	  <div id="viewer" style="display: none;"><h3>CSV Viewer:</h3></div>
 	  <div id="csv_viewer" style="width:640px; height:400px; overflow:scroll; display: none;"></div>
 	  
@@ -199,6 +206,7 @@ $( document ).ready(function() {
           if ($(this).is(':checked')) {
 			  
                $("#sql_query").val(" ");
+			   $("#csv_header").val(" ");
 		    file_name = year + "-" + month + "-" +day+ "-" +hour+minutes+secs+"-ad_hoc.csv";
 			$("#file_name").val(file_name);
 			$("#file_to_send").val(file_name);
@@ -250,7 +258,7 @@ $( document ).ready(function() {
 				
 			} else {
 				csv_sql = "select oi.itemid, oi.numitems from oitems as oi";
-				csv_header = "Record Type | PO Number|Address Type|First Name|Last Name|Address 1|Address 2|City|State|Zip|Phone|Email|Record Type|UPC|Quantity|||||||||S|JNT1|R|Eric Dash|jocksntees Inc|c/o Xpert Fulfillment|8160 Cadillac Hwy|Benzonia|MI|49616|(206)588-2558|ericdash@comcast.net";
+				csv_header = "Record Type|PO Number|Address Type|First Name|Last Name|Address 1|Address 2|City|State|Zip|Phone|EmailRecord Type|UPC|Quantity|||||||||S|JNT1|R|Eric Dash|jocksntees Inc|c/o Xpert Fulfillment|8160 Cadillac Hwy|Benzonia|MI|49616|(206)588-2558|ericdash@comcast.net";
 				$("#sql_query").val(csv_sql);
 				$("#csv_header").val(csv_header);
 			    file_name = year + "-" + month + "-" +day+ "-" +hour+minutes+secs+"-hanes.csv";

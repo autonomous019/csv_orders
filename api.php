@@ -1,5 +1,6 @@
 <?php
 
+//print_r($_REQUEST);
 
 $file_name = $_REQUEST['file_name'];  #  '\t'  tab  '|' pipe ',' comma
 if(empty($file_name)){
@@ -13,7 +14,7 @@ if(empty($delimiter)){
     $delimiter = ",";
 }
 
-$sql_query = $_REQUEST['sql_query'];  
+$sql_query = trim($_REQUEST['sql_query']);  
 if(empty($sql_query)){
     $sql_query = "";
 }
@@ -39,7 +40,7 @@ if(empty($to_date)){
     $to_date = "";
 }
 
-$csv_header = $_REQUEST['csv_header'];  
+$csv_header = trim($_REQUEST['csv_header']);  
 if(empty($csv_header)){
     $csv_header = "";
 }
@@ -56,25 +57,9 @@ if(!empty($from_date) && !empty($to_date) ) {
 //csv_output is whether vendor is hanes, fruit of the loom ("loom"), xpert or an ad_hoc (default) query
 switch ($csv_output) {
     case 'default':
-        //echo "default  case (ad hoc query) \n";
-		//$sql_query = $sql_query." ".$date_sql;
 		$sql_query = $sql_query;
-		
 		break;
-		/*
-		get order status list
-		select order_Status.StatusText from order_Status, orders where orders.status = order_Status.id
-		select order_Status.StatusText from order_Status, orders where orders.status = order_Status.StatusId
-		
-		select distinct order_Status.StatusText from order_Status
 
-		
-		
-select odate from orders where odate BETWEEN  CAST('2014-01-01' AS DATETIME)
-                        AND CAST('2014-01-31' AS DATETIME);
-		
-		*/
-        
 		
     case 'loom':
 		$sql_query = "select p.mfgid, ao.AO_Name, oi.itemname from oitems as oi, products as p, options_Advanced as ao WHERE oi.catalogid = p.catalogid AND ao.ProductID = oi.catalogid ";
@@ -83,12 +68,12 @@ select odate from orders where odate BETWEEN  CAST('2014-01-01' AS DATETIME)
 		
     case 'xpert':
 		$sql_query = "select o.orderid, o.invoicenum_prefix, o.invoicenum, oi.itemid, oi.numitems, o.odate, o.oshipfirstname, o.oshiplastname, o.oshipaddress, o.oshipaddress2, o.oshipcity, o.oshipstate, o.oshipzip, o.oshipphone, o.oshipemail, o.ocomment   from orders as o, oitems as oi where o.orderid = 27 AND oi.orderid = o.orderid ";
-		$csv_header = "order_number".$delimiter." sku".$delimiter." qty".$delimiter." order_date".$delimiter." first_name".$delimiter." last_name".$delimiter." address_1".$delimiter." address_2".$delimiter." city".$delimiter." state ".$delimiter."zip ".$delimiter."telephone ".$delimiter."email ".$delimiter." notes";
+		//$csv_header_temp = "order_number".$delimiter." sku".$delimiter." qty".$delimiter." order_date".$delimiter." first_name".$delimiter." last_name".$delimiter." address_1".$delimiter." address_2".$delimiter." city".$delimiter." state ".$delimiter."zip ".$delimiter."telephone ".$delimiter."email ".$delimiter." notes";
 		break;
 		
     case 'hanes':
-	$sql_query = "select oi.itemid, oi.numitems from oitems as oi";
-	//$csv_header = "SKU, Quantity";
+	    $sql_query = "select oi.itemid, oi.numitems from oitems as oi";
+	    //$csv_header = "SKU, Quantity";
 	
 	   break;
 }
@@ -142,27 +127,39 @@ $result = soap_call($sql_query);
 if (is_array($result['0'])) {	
     $delimiter = $delimiter;
     $result = json_encode($result);
-    //print_r($result);
-    $json_obj = json_decode($result, true);
 
+    $json_obj = json_decode($result, true);
 	$file = 'csv/'.$uid;
 	$text = trim($csv_header) . "\n ";
+	//echo "TEXT ".$text;
 
-	$field_cnt = count(split($delimiter, $csv_header));
-    //have to account for different headers and fields for different csv_output formats here
-	//if($csv_output) == 'hanes'
 	$cnt = 0;
 	$lines = [];
 	$read_lines = [];
+	$line = "";
+    
+	foreach($json_obj as $jo){
 
-	for($cnt = 0; $cnt<count($json_obj); $cnt++){
-		$item_id = $json_obj[$cnt]['itemid'];
-		$numitems = $json_obj[$cnt]['numitems'];
-		echo $json_obj[$cnt]['date_added'];
-		$line .= $item_id . $delimiter . $numitems . "\n ";
+		$jo_keys = array_keys($jo);
+		$keys_len = count($jo);
+		$c = 0;
+		foreach($jo_keys as $jk){
+
+			if($c < $keys_len-1){
+				
+				$line .=  $jo[$jk] . $delimiter;
+			} else {
+				$line .= $jo[$jk] . " \n";
+			}
+			
+			$c++;
+			
+		}
+		array_push($lines, $line);
 		
 	}
-	array_push($lines, $line);
+	
+
 	array_unshift($lines, $text);
 	$result = array_merge((array)$lines, (array)$read_lines);
 	
