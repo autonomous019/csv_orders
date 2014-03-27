@@ -68,6 +68,12 @@
 			<textarea name="sql_query" id="sql_query" style="width: 340px; height: 140px;">select oi.itemid, oi.numitems from oitems as oi
 				
 			</textarea>
+			<br /><br />
+			<textarea name="csv_header" id="csv_header" style="width: 640px; height: 140px;">Record Type|PO Number|Address Type|First Name|Last Name|Address 1|Address 2|City|State|Zip|Phone|Email
+Record Type|UPC|Quantity|||||||||
+S|JNT1|R|Eric Dash|jocksntees Inc|c/o Xpert Fulfillment|8160 Cadillac Hwy|Benzonia|MI|49616|(206)588-2558|ericdash@comcast.net
+				
+			</textarea>
 		   
         <p><input type="submit" id="btn btn-primary btn-lg" name="btn btn-primary btn-lg" role="button" value="Run Query"></submit></p>
       
@@ -217,12 +223,15 @@ $( document ).ready(function() {
 		{
 		    var csv_output = $(this).val();
 			var csv_sql = "";
+			var csv_header = "";
 			
 			//alert(csv_output);
 			//alert($(this).val());	
 			if(csv_output == 'xpert'){
 				csv_sql = "select o.orderid, o.invoicenum_prefix, o.invoicenum, oi.itemid, oi.numitems, o.odate, o.oshipfirstname, o.oshiplastname, o.oshipaddress, o.oshipaddress2, o.oshipcity, o.oshipstate, o.oshipzip, o.oshipphone, o.oshipemail, o.ocomment   from orders as o, oitems as oi where o.orderid = 27 AND oi.orderid = o.orderid";
+				csv_header = "Order Number,SKU,Quantity,Order Date,First Name,Last Name,Address Line 1,Address Line 2,City,State,Zip,Telephone,E-mail,Notes";
 				$("#sql_query").val(csv_sql);
+				$("#csv_header").val(csv_header);
 				
 			    file_name = year + "-" + month + "-" +day+ "-" +hour+minutes+secs+"-xpert.csv";
 				$("#file_name").val(file_name);
@@ -231,7 +240,9 @@ $( document ).ready(function() {
 				
 			} else if(csv_output == 'loom'){
 				csv_sql = "select p.mfgid, ao.AO_Name, oi.itemname from oitems as oi, products as p, options_Advanced as ao WHERE oi.catalogid = p.catalogid AND ao.ProductID = oi.catalogid";
+				csv_header = "Header Here";
 				$("#sql_query").val(csv_sql);
+				$("#csv_header").val(csv_header);
 			    file_name = year + "-" + month + "-" +day+ "-" +hour+minutes+secs+"-loom.csv";
 				$("#file_name").val(file_name);
 				$("#file_to_send").val(file_name);
@@ -239,7 +250,9 @@ $( document ).ready(function() {
 				
 			} else {
 				csv_sql = "select oi.itemid, oi.numitems from oitems as oi";
+				csv_header = "Record Type | PO Number|Address Type|First Name|Last Name|Address 1|Address 2|City|State|Zip|Phone|Email|Record Type|UPC|Quantity|||||||||S|JNT1|R|Eric Dash|jocksntees Inc|c/o Xpert Fulfillment|8160 Cadillac Hwy|Benzonia|MI|49616|(206)588-2558|ericdash@comcast.net";
 				$("#sql_query").val(csv_sql);
+				$("#csv_header").val(csv_header);
 			    file_name = year + "-" + month + "-" +day+ "-" +hour+minutes+secs+"-hanes.csv";
 				$("#file_name").val(file_name);
 				$("#file_to_send").val(file_name);

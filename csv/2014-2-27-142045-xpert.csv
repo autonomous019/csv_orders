@@ -1,0 +1,3 @@
+order_number, sku, qty, order_date, first_name, last_name, address_1, address_2, city, state ,zip ,telephone ,email , notes
+ 1004,1
+ 

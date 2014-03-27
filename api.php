@@ -39,6 +39,11 @@ if(empty($to_date)){
     $to_date = "";
 }
 
+$csv_header = $_REQUEST['csv_header'];  
+if(empty($csv_header)){
+    $csv_header = "";
+}
+
 if(!empty($from_date) && !empty($to_date) ) {
 
 	$date_sql = " AND orders.odate BETWEEN \"".$from_date."\" AND \"".$to_date."\" ";
@@ -54,7 +59,7 @@ switch ($csv_output) {
         //echo "default  case (ad hoc query) \n";
 		//$sql_query = $sql_query." ".$date_sql;
 		$sql_query = $sql_query;
-		$csv_header = "";
+		
 		break;
 		/*
 		get order status list
@@ -73,7 +78,7 @@ select odate from orders where odate BETWEEN  CAST('2014-01-01' AS DATETIME)
 		
     case 'loom':
 		$sql_query = "select p.mfgid, ao.AO_Name, oi.itemname from oitems as oi, products as p, options_Advanced as ao WHERE oi.catalogid = p.catalogid AND ao.ProductID = oi.catalogid ";
-		$csv_header = "";
+		
 		break;
 		
     case 'xpert':
@@ -83,7 +88,7 @@ select odate from orders where odate BETWEEN  CAST('2014-01-01' AS DATETIME)
 		
     case 'hanes':
 	$sql_query = "select oi.itemid, oi.numitems from oitems as oi";
-	$csv_header = "SKU, Quantity";
+	//$csv_header = "SKU, Quantity";
 	
 	   break;
 }
@@ -153,6 +158,7 @@ if (is_array($result['0'])) {
 	for($cnt = 0; $cnt<count($json_obj); $cnt++){
 		$item_id = $json_obj[$cnt]['itemid'];
 		$numitems = $json_obj[$cnt]['numitems'];
+		echo $json_obj[$cnt]['date_added'];
 		$line .= $item_id . $delimiter . $numitems . "\n ";
 		
 	}
