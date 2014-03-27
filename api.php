@@ -1,15 +1,6 @@
 <?php
 
 
-//api.php
-
-/*
-<userKey>56200466507949522562004665079495</userKey>
-<storeUrl>www.jocksntees.com</storeUrl>
-
-*/
-//print_r($_REQUEST);
-//Send data to the 3dcart api to query the database. 
 $file_name = $_REQUEST['file_name'];  #  '\t'  tab  '|' pipe ',' comma
 if(empty($file_name)){
     $file_name = " ";
@@ -21,6 +12,7 @@ $delimiter = $_REQUEST['delimiter'];  #  '\t'  tab  '|' pipe ',' comma
 if(empty($delimiter)){
     $delimiter = ",";
 }
+
 $sql_query = $_REQUEST['sql_query'];  
 if(empty($sql_query)){
     $sql_query = "";
@@ -56,12 +48,14 @@ if(!empty($from_date) && !empty($to_date) ) {
 	$date_sql = "";
 }
 
+//csv_output is whether vendor is hanes, fruit of the loom ("loom"), xpert or an ad_hoc (default) query
 switch ($csv_output) {
     case 'default':
         //echo "default  case (ad hoc query) \n";
 		//$sql_query = $sql_query." ".$date_sql;
 		$sql_query = $sql_query;
 		$csv_header = "";
+		break;
 		/*
 		get order status list
 		select order_Status.StatusText from order_Status, orders where orders.status = order_Status.id
@@ -75,28 +69,26 @@ select odate from orders where odate BETWEEN  CAST('2014-01-01' AS DATETIME)
                         AND CAST('2014-01-31' AS DATETIME);
 		
 		*/
-        break;
+        
+		
     case 'loom':
-        //echo "fruit of the looms case \n";
 		$sql_query = "select p.mfgid, ao.AO_Name, oi.itemname from oitems as oi, products as p, options_Advanced as ao WHERE oi.catalogid = p.catalogid AND ao.ProductID = oi.catalogid ";
 		$csv_header = "";
-	
+		break;
 		
-        break;
     case 'xpert':
-        //echo "xpert case \n";
 		$sql_query = "select o.orderid, o.invoicenum_prefix, o.invoicenum, oi.itemid, oi.numitems, o.odate, o.oshipfirstname, o.oshiplastname, o.oshipaddress, o.oshipaddress2, o.oshipcity, o.oshipstate, o.oshipzip, o.oshipphone, o.oshipemail, o.ocomment   from orders as o, oitems as oi where o.orderid = 27 AND oi.orderid = o.orderid ";
 		$csv_header = "order_number".$delimiter." sku".$delimiter." qty".$delimiter." order_date".$delimiter." first_name".$delimiter." last_name".$delimiter." address_1".$delimiter." address_2".$delimiter." city".$delimiter." state ".$delimiter."zip ".$delimiter."telephone ".$delimiter."email ".$delimiter." notes";
+		break;
 		
-        break;
     case 'hanes':
-	   //echo "hanes case \n";
 	$sql_query = "select oi.itemid, oi.numitems from oitems as oi";
 	$csv_header = "SKU, Quantity";
 	
 	   break;
 }
 
+//query the api 
 function soap_call($sql) {
 	// build parameters for call
 	$param = array(
@@ -136,9 +128,7 @@ function soap_call($sql) {
 }
 
 
-// write your SQL statements
-//$sql ="select * from orders where orders.orderid = 27;";
-//
+
 // call soap function.
 $result = soap_call($sql_query);
 
@@ -149,9 +139,6 @@ if (is_array($result['0'])) {
     $result = json_encode($result);
     //print_r($result);
     $json_obj = json_decode($result, true);
-	
-    //chmod("csv/'.$uid.'.csv, 0775);
-	
 
 	$file = 'csv/'.$uid;
 	$text = trim($csv_header) . "\n ";
@@ -170,7 +157,6 @@ if (is_array($result['0'])) {
 		
 	}
 	array_push($lines, $line);
-	//array_push($lines, $text);
 	array_unshift($lines, $text);
 	$result = array_merge((array)$lines, (array)$read_lines);
 	
@@ -181,16 +167,10 @@ if (is_array($result['0'])) {
 		array_push($l_arr, $l);
 		echo $l;
 		fwrite($fp, $l);
-		//fputcsv($fp, $l_arr, $delimiter);
 	}
-	
-	
-	//$file = file_get_contents('csv/'.$uid, true);
+
 	echo "</pre>";
-	
-	//fputcsv($fp, $lines, $delimiter);
-	
-	
+
 	
 } else {
     //

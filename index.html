@@ -84,20 +84,17 @@
 	  
 	  
 	  
-	  <p><a class="btn btn-primary btn-lg" role="button"  id="download" name="download" href="" style="display:none;">Download &raquo;</a></p>
+	  <p><a class="btn btn-primary btn-lg" role="button"  id="download" name="download" href="" style="display:none;"  download>Download &raquo;</a></p>
 	  
 	  
 	  <hr>
-	  <!-- 
+
 		
 		  Host: ftp.pointbweb.net
 		  Login: test@pointbweb.net
 		  PW: pbw#test1
 
-          tests hard coded into form, remove before production
-		
-		  
-		  -->
+      
 	  <form id="ftp" name="ftp" action="ftp.php" method="post" style="display: none;">
 	  
 	  Username: <input type="text" value="test@pointbweb.net" name="username" id="username" text="username" style="margin-left: 10px;" /><br />
@@ -293,10 +290,10 @@ $( document ).ready(function() {
 			    var postData = $(this).serializeArray();
 			    var formURL = $(this).attr("action");
 				var file_to_send = $("#file_name").val();
-				alert(file_to_send);
+				//alert(file_to_send);
 				
 				$("#file_to_send").val(file_to_send);
-				alert($("#file_to_send").val());
+				//alert($("#file_to_send").val());
 				
 			    $.ajax(
 			    {
