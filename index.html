@@ -281,21 +281,30 @@ $( document ).ready(function() {
 				$("#csv_viewer").css("color","#fff");
 				$("#csv_viewer").css("font-family", "Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New");
 				
+				
 			    var postData = $(this).serializeArray();
 			    var formURL = $(this).attr("action");
+				
+				
 			    $.ajax(
 			    {
-			        url : formURL,
+			        url : "http://admin.jocksntees.com/api.php",
+					//crossDomain : true,
+					dataType: "jsonp",
 			        type: "POST",
 			        data : postData,
 			        success:function(data, textStatus, jqXHR) 
 			        {
 			            //data: return data from server
-						$('#csv_viewer').html(data);
+						alert(data);
+						//$('#csv_viewer').html(data);
+						callFunction(data);
 			        },
 			        error: function(jqXHR, textStatus, errorThrown) 
 			        {
-			            //if fails      
+			            
+						alert(errorThrown);
+						alert("orders query failed to be sent to server");    
 			        }
 			    });
 			    e.preventDefault(); //STOP default action
@@ -337,7 +346,9 @@ $( document ).ready(function() {
 			
 			
 			
-			
+			function callFunction(data){
+			 $('#csv_viewer').innerHTML = data;
+			}
 			
 			
 			

@@ -1,6 +1,6 @@
 <?php
 
-//print_r($_REQUEST);
+
 
 $file_name = $_REQUEST['file_name'];  #  '\t'  tab  '|' pipe ',' comma
 if(empty($file_name)){
@@ -134,8 +134,8 @@ if (is_array($result['0'])) {
 	//echo "TEXT ".$text;
 
 	$cnt = 0;
-	$lines = [];
-	$read_lines = [];
+	$lines = array();
+	$read_lines = array();
 	$line = "";
     
 	foreach($json_obj as $jo){
@@ -151,7 +151,7 @@ if (is_array($result['0'])) {
 			} else {
 				$line .= $jo[$jk] . " \n";
 			}
-			
+			echo $line;
 			$c++;
 			
 		}
@@ -166,9 +166,9 @@ if (is_array($result['0'])) {
 	$fp = fopen('csv/'.$uid, 'w');
 	echo "<pre>";
 	foreach($lines as $l){
-		$l_arr = [];
+		$l_arr = array();
 		array_push($l_arr, $l);
-		echo $l;
+		//echo $l;
 		fwrite($fp, $l);
 	}
 
