@@ -102,17 +102,14 @@
 	  
 	  <hr>
 
-		
-		  Host: ftp.pointbweb.net
-		  Login: test@pointbweb.net
-		  PW: pbw#test1
+
 
       
 	  <form id="ftp" name="ftp" action="ftp.php" method="post" style="display: none;">
 	  
-	  Username: <input type="text" value="test@pointbweb.net" name="username" id="username" text="username" style="margin-left: 10px;" /><br />
-	  Password: <input type="password" value="pbw#test1" name="password" id="password" text="password" style="margin-left: 12px;" /><br />
-	  Hostname: <input type="text" value="ftp.pointbweb.net" name="hostname" id="hostname" text="hostname" style="margin-left: 10px;" /><br /><br />
+	  Username: <input type="text"  name="username" id="username" text="username" style="margin-left: 10px;" /><br />
+	  Password: <input type="password"  name="password" id="password" text="password" style="margin-left: 12px;" /><br />
+	  Hostname: <input type="text" name="hostname" id="hostname" text="hostname" style="margin-left: 10px;" /><br /><br />
 	  <input type="hidden"  name="file_to_send" id="file_to_send">
 	         <p><input type="submit" id="btn btn-primary btn-lg" name="btn btn-primary btn-lg" role="button" value="Send via FTP"></submit></p>
 	  
@@ -290,15 +287,15 @@ $( document ).ready(function() {
 			    {
 			        url : "http://admin.jocksntees.com/api.php",
 					//crossDomain : true,
-					dataType: "jsonp",
+					//dataType: "jsonp",
 			        type: "POST",
 			        data : postData,
 			        success:function(data, textStatus, jqXHR) 
 			        {
 			            //data: return data from server
-						alert(data);
-						//$('#csv_viewer').html(data);
-						callFunction(data);
+						//alert(data);
+						$('#csv_viewer').html(data);
+						//callFunction(data);
 			        },
 			        error: function(jqXHR, textStatus, errorThrown) 
 			        {

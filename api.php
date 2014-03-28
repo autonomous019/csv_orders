@@ -139,8 +139,14 @@ if (is_array($result['0'])) {
 	$line = "";
     
 	foreach($json_obj as $jo){
-
+     
 		$jo_keys = array_keys($jo);
+		if($csv_output == 'default'){
+			$text = $jo_keys;
+			$text = implode($delimiter,$text);
+			$text = $text . " \n";
+		}
+		
 		$keys_len = count($jo);
 		$c = 0;
 		foreach($jo_keys as $jk){
@@ -151,15 +157,11 @@ if (is_array($result['0'])) {
 			} else {
 				$line .= $jo[$jk] . " \n";
 			}
-			echo $line;
-			$c++;
-			
+			//echo $line;
+			$c++;	
 		}
-		
-		
 	}
 	array_push($lines, $line);
-
 	array_unshift($lines, $text);
 	$result = array_merge((array)$lines, (array)$read_lines);
 	
@@ -168,11 +170,18 @@ if (is_array($result['0'])) {
 	foreach($lines as $l){
 		$l_arr = array();
 		array_push($l_arr, $l);
-		//echo $l;
+		echo $l;
+		$l_arr = implode($delimiter, $l_arr);
 		fwrite($fp, $l);
+		
 	}
 
 	echo "</pre>";
+	//echo $delimiter;
+	//$lines = implode($delimiter, $l_arr);
+	//print_r($lines);
+	//file_put_contents($fp, $lines);
+	//fwrite($fp, $lines);
 
 	
 } else {
