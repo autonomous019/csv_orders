@@ -77,21 +77,14 @@
 	  			<textarea name="csv_header" id="csv_header" style="width: 640px; height: 140px;">Record Type|PO Number|Address Type|First Name|Last Name|Address 1|Address 2|City|State|Zip|Phone|EmailRecord Type|UPC|Quantity|||||||||S|JNT1|R|Eric Dash|jocksntees Inc|c/o Xpert Fulfillment|8160 Cadillac Hwy|Benzonia|MI|49616|(206)588-2558|ericdash@comcast.net
 				
 	  			</textarea>
-	  
-	  
-	  
-	  
+	
 	  </form>
 	  <hr>
 	  
 	
 	  
-	  <div id="viewer" style="display: none;"><h3>CSV Viewer:</h3></div>
+	  <div id="viewer" style="display: none;" class="loader" ><h3>CSV Viewer:</h3></div>
 	  <div id="csv_viewer" style="width:640px; height:400px; overflow:scroll; display: none;"></div>
-	  
-	 
-	 
-	  
 	  
 	  <br />
 	  
@@ -149,12 +142,7 @@
 		
 		//compiles the status list for the status dropdown ie. "processing", created by status.php
 		$( document ).ready(function() {
-			
-			
-			
-			
-			
-			
+		
 		  $.ajax({
 		        url: "status.php",
 		        data: {
@@ -295,6 +283,7 @@ $( document ).ready(function() {
 			            //data: return data from server
 						//alert(data);
 						$('#csv_viewer').html(data);
+						$(".loader").fadeOut("slow");
 						//callFunction(data);
 			        },
 			        error: function(jqXHR, textStatus, errorThrown) 

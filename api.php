@@ -45,6 +45,7 @@ if(empty($csv_header)){
     $csv_header = "";
 }
 
+
 if(!empty($from_date) && !empty($to_date) ) {
 
 	$date_sql = " AND orders.odate BETWEEN \"".$from_date."\" AND \"".$to_date."\" ";
@@ -53,6 +54,24 @@ if(!empty($from_date) && !empty($to_date) ) {
 } else {
 	$date_sql = "";
 }
+
+//need a switch to deal with swapping out delimiter of pre-defined csv headers
+//str_replace($orig_delimiter,$delimiter,$csv_header);
+if (strpos($csv_header,'\t') !== false) {
+	$orig_delimiter = '\t';
+	$delimiter = "\t";
+	$csv_header = str_replace($orig_delimiter,$delimiter,$csv_header);
+    
+} elseif (strpos($csv_header,'|') !== false){
+	$orig_delimiter = '|';
+	$csv_header = str_replace($orig_delimiter,$delimiter,$csv_header);
+} else {
+	$orig_delimiter = ',';
+	$csv_header = str_replace($orig_delimiter,$delimiter,$csv_header);
+	
+}
+
+
 
 //csv_output is whether vendor is hanes, fruit of the loom ("loom"), xpert or an ad_hoc (default) query
 switch ($csv_output) {
