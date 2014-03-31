@@ -42,7 +42,8 @@
 				   <br/><br/>
 				   
 			CSV Output <select name="csv_output" id="csv_output" title="vendor" >
-                     <option value="hanes" selected>Hanes</option>
+				     <option value="" selected>SELECT</option>
+                     <option value="hanes">Hanes</option>
 					 <option value="loom" >Fruit of the Loom</option>
 					 <option value="xpert" >Xpert</option>
  
@@ -65,7 +66,7 @@
 			
 		<input type="checkbox" name="ad_hoc" id="ad_hoc" value="ad_hoc">Ad Hoc Query?<br>  
 
-			<textarea name="sql_query" id="sql_query" style="width: 340px; height: 140px;">select oi.itemid, oi.numitems from oitems as oi
+			<textarea name="sql_query" id="sql_query" style="width: 340px; height: 140px;">
 				
 			</textarea>
 
@@ -74,8 +75,7 @@
 	  <br /><br />
 	  CSV Header:
 	  			<br />
-	  			<textarea name="csv_header" id="csv_header" style="width: 640px; height: 140px;">Record Type|PO Number|Address Type|First Name|Last Name|Address 1|Address 2|City|State|Zip|Phone|EmailRecord Type|UPC|Quantity|||||||||S|JNT1|R|Eric Dash|jocksntees Inc|c/o Xpert Fulfillment|8160 Cadillac Hwy|Benzonia|MI|49616|(206)588-2558|ericdash@comcast.net
-				
+	  			<textarea name="csv_header" id="csv_header" style="width: 640px; height: 140px;">
 	  			</textarea>
 	
 	  </form>
@@ -183,15 +183,13 @@ $( document ).ready(function() {
 	$("#download").attr("href", "csv/"+file_name);
 	$("#file_to_send").val(file_name);
 
-
-
 		
 		$("#ad_hoc").change(function(e)
 		{
           if ($(this).is(':checked')) {
 			  
-               $("#sql_query").val(" ");
-			   $("#csv_header").val(" ");
+            //$("#sql_query").val(" ");
+			//$("#csv_header").val(" ");
 		    file_name = year + "-" + month + "-" +day+ "-" +hour+minutes+secs+"-ad_hoc.csv";
 			$("#file_name").val(file_name);
 			$("#file_to_send").val(file_name);
@@ -217,6 +215,7 @@ $( document ).ready(function() {
 		    var csv_output = $(this).val();
 			var csv_sql = "";
 			var csv_header = "";
+			var order_status = $("#status").val();
 			
 			//alert(csv_output);
 			//alert($(this).val());	
@@ -242,8 +241,8 @@ $( document ).ready(function() {
 				$("#download").attr("href", "csv/"+file_name);
 				
 			} else {
-				csv_sql = "select oi.itemid, oi.numitems from oitems as oi";
-				csv_header = "Record Type|PO Number|Address Type|First Name|Last Name|Address 1|Address 2|City|State|Zip|Phone|EmailRecord Type|UPC|Quantity|||||||||S|JNT1|R|Eric Dash|jocksntees Inc|c/o Xpert Fulfillment|8160 Cadillac Hwy|Benzonia|MI|49616|(206)588-2558|ericdash@comcast.net";
+				csv_sql = "SELECT DISTINCTROW 'O' as recordtype, oitems.itemid AS sku, Sum(oitems.numitems) AS qty FROM orders INNER JOIN oitems ON orders.orderid = oitems.orderid GROUP BY oitems.itemid, orders.odate, orders.order_status AND ((orders.order_status)="+status+")";
+				csv_header = "Record Type|PO Number|Address Type|First Name|Last Name|Address 1|Address 2|City|State|Zip|Phone|Email\nRecord Type|UPC|Quantity|||||||||\nS|JNT1|R|Eric Dash|jocksntees Inc|c/o Xpert Fulfillment|8160 Cadillac Hwy|Benzonia|MI|49616|(206)588-2558|ericdash@comcast.net\n";
 				$("#sql_query").val(csv_sql);
 				$("#csv_header").val(csv_header);
 			    file_name = year + "-" + month + "-" +day+ "-" +hour+minutes+secs+"-hanes.csv";
@@ -273,7 +272,8 @@ $( document ).ready(function() {
 				
 			    $.ajax(
 			    {
-			        url : "http://admin.jocksntees.com/api.php",
+					url : "api.php",
+			        //url : "http://admin.jocksntees.com/api.php",
 					//crossDomain : true,
 					//dataType: "jsonp",
 			        type: "POST",

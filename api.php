@@ -1,101 +1,77 @@
 <?php
+/*
+SELECT DISTINCTROW oitems.itemid AS sku, Sum(oitems.numitems) AS qty
+FROM orders INNER JOIN oitems ON orders.orderid = oitems.orderid
+GROUP BY oitems.itemid, orders.odate, orders.order_status
+HAVING (((orders.odate) Between #3/1/2014# And #3/31/2014#) AND ((orders.order_status)=7))
 
 
-
-$file_name = $_REQUEST['file_name'];  #  '\t'  tab  '|' pipe ',' comma
-if(empty($file_name)){
-    $file_name = " ";
-}
-$uid = $file_name;
+Hanes no add-on criteria:
+SELECT DISTINCTROW oitems.itemid AS sku, Sum(oitems.numitems) AS qty
+FROM orders INNER JOIN oitems ON orders.orderid = oitems.orderid
+GROUP BY oitems.itemid, orders.odate, orders.order_status
 
 
-$delimiter = $_REQUEST['delimiter'];  #  '\t'  tab  '|' pipe ',' comma
-if(empty($delimiter)){
-    $delimiter = ",";
-}
-
-$sql_query = trim($_REQUEST['sql_query']);  
-if(empty($sql_query)){
-    $sql_query = "";
-}
-
-$csv_output = $_REQUEST['csv_output'];  
-if(empty($csv_output)){
-    $csv_output = "default";
-}
-
-$ad_hoc = $_REQUEST['ad_hoc'];  
-if(!empty($ad_hoc)){
-    $csv_output = "default";
-}
-
-//need to handle date ranges for each csv_output case
-$from_date = $_REQUEST['from_date'];  
-if(empty($from_date)){
-    $from_date = "";
-} 
-
-$to_date = $_REQUEST['to_date'];  
-if(empty($to_date)){
-    $to_date = "";
-}
-
-$csv_header = trim($_REQUEST['csv_header']);  
-if(empty($csv_header)){
-    $csv_header = "";
-}
+*/
 
 
-if(!empty($from_date) && !empty($to_date) ) {
-
-	$date_sql = " AND orders.odate BETWEEN \"".$from_date."\" AND \"".$to_date."\" ";
+function setDateSql($from_date, $to_date, $model){
+	if(empty($from_date) || empty($to_date)){
+		$date_sql = "";
+		return $date_sql;
+	}
 	
-	
-} else {
-	$date_sql = "";
-}
+	switch ($model) {
+	    case 'default':
+			$date_sql = " HAVING (((orders.odate) Between #".$from_date."# And #".$to_date."#)";
+			break;
 
-//need a switch to deal with swapping out delimiter of pre-defined csv headers
-//str_replace($orig_delimiter,$delimiter,$csv_header);
-if (strpos($csv_header,'\t') !== false) {
-	$orig_delimiter = '\t';
-	$delimiter = "\t";
-	$csv_header = str_replace($orig_delimiter,$delimiter,$csv_header);
-    
-} elseif (strpos($csv_header,'|') !== false){
-	$orig_delimiter = '|';
-	$csv_header = str_replace($orig_delimiter,$delimiter,$csv_header);
-} else {
-	$orig_delimiter = ',';
-	$csv_header = str_replace($orig_delimiter,$delimiter,$csv_header);
+	    case 'loom':
+			$date_sql = " HAVING (((orders.odate) Between #".$from_date."# And #".$to_date."#)";		
+			break;
+		
+	    case 'xpert':
+			$date_sql = " HAVING (((orders.odate) Between #".$from_date."# And #".$to_date."#)";
+			break;
+		
+	    case 'hanes':
+		   $date_sql = " HAVING (((orders.odate) Between #".$from_date."# And #".$to_date."#)";	
+		   break;
+	}
+	return $date_sql;
 	
 }
 
-
-
-//csv_output is whether vendor is hanes, fruit of the loom ("loom"), xpert or an ad_hoc (default) query
-switch ($csv_output) {
-    case 'default':
-		$sql_query = $sql_query;
-		break;
-
-		
-    case 'loom':
-		$sql_query = "select p.mfgid, ao.AO_Name, oi.itemname from oitems as oi, products as p, options_Advanced as ao WHERE oi.catalogid = p.catalogid AND ao.ProductID = oi.catalogid ";
-		
-		break;
-		
-    case 'xpert':
-		$sql_query = "select o.orderid, o.invoicenum_prefix, o.invoicenum, oi.itemid, oi.numitems, o.odate, o.oshipfirstname, o.oshiplastname, o.oshipaddress, o.oshipaddress2, o.oshipcity, o.oshipstate, o.oshipzip, o.oshipphone, o.oshipemail, o.ocomment   from orders as o, oitems as oi where o.orderid = 27 AND oi.orderid = o.orderid ";
-		//$csv_header_temp = "order_number".$delimiter." sku".$delimiter." qty".$delimiter." order_date".$delimiter." first_name".$delimiter." last_name".$delimiter." address_1".$delimiter." address_2".$delimiter." city".$delimiter." state ".$delimiter."zip ".$delimiter."telephone ".$delimiter."email ".$delimiter." notes";
-		break;
-		
-    case 'hanes':
-	    $sql_query = "select oi.itemid, oi.numitems from oitems as oi";
-	    //$csv_header = "SKU, Quantity";
+function setStatusSql($status, $model){
 	
-	   break;
+	if(empty($status) || empty($model)){
+		$status = "";
+		return $status;
+	}
+	
+	switch ($model) {
+	    case 'default':
+			$status = " AND ((orders.order_status)=".$status.") ";
+			break;
+
+	    case 'loom':
+			$status = " AND ((orders.order_status)=".$status.") ";	
+			break;
+		
+	    case 'xpert':
+			$status = " AND ((orders.order_status)=".$status.") ";
+			break;
+		
+	    case 'hanes':
+		
+		   $status = " AND ((orders.order_status)=".$status.") ";
+		   break;
+	}	
+	return $status;
+	
+
 }
+
 
 //query the api 
 function soap_call($sql) {
@@ -138,6 +114,116 @@ function soap_call($sql) {
 
 
 
+
+$file_name = $_REQUEST['file_name'];  #  '\t'  tab  '|' pipe ',' comma
+if(empty($file_name)){
+    $file_name = " ";
+}
+$uid = $file_name;
+
+
+$delimiter = $_REQUEST['delimiter'];  #  '\t'  tab  '|' pipe ',' comma
+if(empty($delimiter)){
+    $delimiter = ",";
+}
+
+$sql_query = trim($_REQUEST['sql_query']);  
+if(empty($sql_query)){
+    $sql_query = "";
+}
+
+$csv_output = $_REQUEST['csv_output'];  
+if(empty($csv_output)){
+    $csv_output = "default";
+}
+
+$ad_hoc = $_REQUEST['ad_hoc'];  
+if(!empty($ad_hoc)){
+    $csv_output = "default";
+}
+
+//need to handle date ranges for each csv_output case
+$from_date = $_REQUEST['from_date'];  
+if(empty($from_date)){
+    $from_date = "";
+} 
+
+$to_date = $_REQUEST['to_date'];  
+if(empty($to_date)){
+    $to_date = "";
+}
+
+$status = $_REQUEST['status'];  
+if(empty($status)){
+    $status = "";
+}
+
+$csv_header = trim($_REQUEST['csv_header']);  
+if(empty($csv_header)){
+    $csv_header = "";
+}
+
+
+
+//need a switch to deal with swapping out delimiter of pre-defined csv headers
+//str_replace($orig_delimiter,$delimiter,$csv_header);
+if (strpos($csv_header,'\t') !== false) {
+	$orig_delimiter = '\t';
+	$delimiter = "\t";
+	$csv_header = str_replace($orig_delimiter,$delimiter,$csv_header);
+    
+} elseif (strpos($csv_header,'|') !== false){
+	$orig_delimiter = '|';
+	$csv_header = str_replace($orig_delimiter,$delimiter,$csv_header);
+} else {
+	$orig_delimiter = ',';
+	$csv_header = str_replace($orig_delimiter,$delimiter,$csv_header);
+	
+}
+
+
+
+
+//csv_output is whether vendor is hanes, fruit of the loom ("loom"), xpert or an ad_hoc (default) query
+switch ($csv_output) {
+    case 'default':
+	    $date_sql = setDateSql($from_date, $to_date, 'default');
+	    $status = setStatusSql($status, 'default');
+		$sql_query = $sql_query . $date_sql . $status;
+		echo $sql_query;
+		break;
+
+		
+    case 'loom':
+		//$sql_query = "select p.mfgid, ao.AO_Name, oi.itemname from oitems as oi, products as p, options_Advanced as ao WHERE oi.catalogid = p.catalogid AND ao.ProductID = oi.catalogid ".$date_sql . $status;
+	    $date_sql = setDateSql($from_date, $to_date, 'loom');
+	    $status = setStatusSql($status, 'loom');
+		$sql_query = $sql_query . $date_sql . $status;
+		echo $sql_query;
+		
+		break;
+		
+    case 'xpert':
+		//$sql_query = "select o.orderid, o.invoicenum_prefix, o.invoicenum, oi.itemid, oi.numitems, o.odate, o.oshipfirstname, o.oshiplastname, o.oshipaddress, o.oshipaddress2, o.oshipcity, o.oshipstate, o.oshipzip, o.oshipphone, o.oshipemail, o.ocomment   from orders as o, oitems as oi where o.orderid = 27 AND oi.orderid = o.orderid ";
+		//$csv_header_temp = "order_number".$delimiter." sku".$delimiter." qty".$delimiter." order_date".$delimiter." first_name".$delimiter." last_name".$delimiter." address_1".$delimiter." address_2".$delimiter." city".$delimiter." state ".$delimiter."zip ".$delimiter."telephone ".$delimiter."email ".$delimiter." notes";
+	    $date_sql = setDateSql($from_date, $to_date, 'expert');
+	    $status = setStatusSql($status, 'expert');
+		$sql_query = $sql_query . $date_sql . $status;
+		echo $sql_query;
+		break;
+		
+    case 'hanes':
+	    $date_sql = setDateSql($from_date, $to_date, 'hanes');
+	    $status = setStatusSql($status, 'hanes');
+		$sql_query = $sql_query . $date_sql . $status;
+		echo $sql_query;
+	   break;
+}
+
+
+
+
+
 // call soap function.
 $result = soap_call($sql_query);
 
@@ -149,7 +235,7 @@ if (is_array($result['0'])) {
 
     $json_obj = json_decode($result, true);
 	$file = 'csv/'.$uid;
-	$text = trim($csv_header) . "\n ";
+	$text = trim($csv_header) . "\n";
 	//echo "TEXT ".$text;
 
 	$cnt = 0;
@@ -161,9 +247,9 @@ if (is_array($result['0'])) {
      
 		$jo_keys = array_keys($jo);
 		if($csv_output == 'default'){
-			$text = $jo_keys;
-			$text = implode($delimiter,$text);
-			$text = $text . " \n";
+			//$text = $jo_keys;
+			//$text = implode($delimiter,$text);
+			//$text = $text . " \n";
 		}
 		
 		$keys_len = count($jo);

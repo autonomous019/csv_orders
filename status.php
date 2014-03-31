@@ -10,7 +10,7 @@
 //Send data to the 3dcart api to query the database. 
 
 $uid = uniqid();
-$sql = "select distinct order_Status.StatusText from order_Status";
+$sql = "select distinct order_Status.StatusText, order_Status.StatusID from order_Status";
 
 
 function soap_call($sql) {
@@ -66,10 +66,12 @@ if (is_array($result['0'])) {
     //print_r($result);
     $json_obj = json_decode($result, true);
 	
+	//print_r($json_obj);
+	
     echo "<select name=\"status\" id=\"status\">";
         foreach ($json_obj as $row) {
 			
-			echo "<option value=\"".$row['StatusText']. "\" >".$row['StatusText']. "<option>";
+			echo "<option value=\"".$row['StatusID']. "\" >".$row['StatusText']. "</option>";
 		    
         }
 		echo "</select>";
